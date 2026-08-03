@@ -1,0 +1,64 @@
+clc;
+clear;
+close all;
+
+%% Read Image
+img = imread('image.jpg');
+
+% Convert to grayscale if RGB
+if size(img,3) == 3
+    img = rgb2gray(img);
+end
+
+%% Histogram Equalization
+eq_img = histeq(img);
+
+%% Kernel for Correlation and Convolution
+kernel = [1 1;
+          1 -1];
+
+%% Convert image to double
+img_double = double(img);
+
+%% Correlation
+correlation_output = imfilter(img_double, kernel, 'corr', 'same');
+
+%% Convolution
+convolution_output = conv2(img_double, kernel, 'same');
+
+%% Display Images
+figure('Name','Images','NumberTitle','off');
+
+subplot(2,2,1);
+imshow(img);
+title('Original Image');
+
+subplot(2,2,2);
+imshow(eq_img);
+title('Histogram Equalized Image');
+
+subplot(2,2,3);
+imshow(correlation_output, []);
+title('Correlation Output');
+
+subplot(2,2,4);
+imshow(convolution_output, []);
+title('Convolution Output');
+
+%% Display Histograms
+figure('Name','Histograms','NumberTitle','off');
+
+subplot(1,2,1);
+imhist(img);
+title('Histogram of Original Image');
+
+subplot(1,2,2);
+imhist(eq_img);
+title('Histogram of Equalized Image');
+
+%% Display Pixel Values (Optional)
+disp('Correlation Output Matrix:');
+disp(correlation_output);
+
+disp('Convolution Output Matrix:');
+disp(convolution_output);
