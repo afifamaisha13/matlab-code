@@ -1,0 +1,89 @@
+clc;
+clear;
+close all;
+
+%% Read Image
+img = imread('images.jfif');
+
+% Convert to grayscale if needed
+if size(img,3)==3
+    img = rgb2gray(img);
+end
+
+img = double(img);
+
+%% ======================
+% DCT
+%% ======================
+dct_img = dct2(img);
+
+%% ======================
+% FFT
+%% ======================
+fft_img = fft2(img);
+
+% FFT Spectrum
+fft_shift = fftshift(fft_img);
+fft_spectrum = log(1 + abs(fft_shift));
+
+%% ======================
+% Haar Transform
+%% ======================
+
+[r,c] = size(img);
+
+haar_temp = zeros(r,c);
+
+% Row Haar
+for i = 1:r
+    k = 1;
+    for j = 1:2:c
+        avg = (img(i,j) + img(i,j+1))/2;
+        diff = (img(i,j) - img(i,j+1))/2;
+
+        haar_temp(i,k) = avg;
+        haar_temp(i,k + c/2) = diff;
+
+        k = k + 1;
+    end
+end
+
+haar_img = zeros(r,c);
+
+% Column Haar
+for j = 1:c
+    k = 1;
+    for i = 1:2:r
+        avg = (haar_temp(i,j) + haar_temp(i+1,j))/2;
+        diff = (haar_temp(i,j) - haar_temp(i+1,j))/2;
+
+        haar_img(k,j) = avg;
+        haar_img(k + r/2,j) = diff;
+
+        k = k + 1;
+    end
+end
+
+%% ======================
+% Display
+%% ======================
+
+figure;
+
+subplot(2,2,1);
+imshow(uint8(img));
+title('Original Image');
+
+subplot(2,2,2);
+imshow(log(abs(dct_img)),[]);
+title('Discrete Cosine Transform');
+
+subplot(2,2,3);
+imshow(fft_spectrum,[]);
+title('Fast Fourier Transform');
+
+subplot(2,2,4);
+imshow(uint8(haar_img),[]);
+title('Haar Transform');
+
+
