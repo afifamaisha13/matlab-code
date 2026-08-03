@@ -1,0 +1,36 @@
+clc;
+clear;
+close all;
+
+%% 1. Read a Color Image
+img = imread('Lenna_(test_image).png');
+
+%% 2. Display Color Image
+figure;
+imshow(img);
+title('Color Image');
+
+%% 3. Convert Color Image to Grayscale
+gray_img = rgb2gray(img);
+
+%% 4. Display Grayscale Image
+figure;
+imshow(gray_img);
+title('Grayscale Image');
+
+%% 5. Normalize the Pixel Values (0–255)
+
+% Convert image to double
+gray_double = double(gray_img);
+
+% Normalize pixel values to the range 0–255
+normalized_img = 255 * (gray_double - min(gray_double(:))) / ...
+    (max(gray_double(:)) - min(gray_double(:)));
+
+% Convert back to uint8 for display
+normalized_img = uint8(normalized_img);
+
+%% 6. Display Normalized Image
+figure;
+imshow(normalized_img);
+title('Normalized Image (0-255)');
