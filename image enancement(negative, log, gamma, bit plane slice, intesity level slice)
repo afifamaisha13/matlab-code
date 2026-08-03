@@ -48,26 +48,14 @@ title('Power Law Transformation');
 
 figure;
 
-% Bit Plane 0 (LSB)
-bit0 = uint8(bitget(img,1) * 255);
+for k = 1:8
+    % Extract kth bit plane
+    bit_plane = uint8(bitget(img, k) * 255);
 
-subplot(2,2,1);
-imshow(bit0);
-title('Bit Plane 0');
-
-% Bit Plane 1
-bit1 = uint8(bitget(img,2) * 255);
-
-subplot(2,2,2);
-imshow(bit1);
-title('Bit Plane 1');
-
-% Bit Plane 2
-bit2 = uint8(bitget(img,3) * 255);
-
-subplot(2,2,3);
-imshow(bit2);
-title('Bit Plane 2');
+    subplot(2,4,k);
+    imshow(bit_plane);
+    title(['Bit Plane ', num2str(k-1)]);
+end
 %% 5. Intensity Level Slicing
 slice_img = img;
 
