@@ -1,0 +1,90 @@
+clc;
+clear;
+close all;
+
+% Read image
+img = imread('Lenna_(test_image).png');
+
+% Convert RGB to Gray
+if size(img,3) == 3
+    img = rgb2gray(img);
+end
+
+figure, imshow(img), title('Original Image');
+
+%% 1. Image Negative
+negative = 255 - img;
+
+figure;
+imshow(negative);
+title('Image Negative');
+
+%% 2. Log Transformation
+img_double = double(img);
+
+c = 255 / log(1 + max(img_double(:)));
+
+log_transform = c * log(1 + img_double);
+
+log_transform = uint8(log_transform);
+
+figure;
+imshow(log_transform);
+title('Log Transformation');
+
+%% 3. Power Law / Gamma Transformation
+gamma = 0.5;
+
+img_norm = im2double(img);
+
+power_law = img_norm .^ gamma;
+
+figure;
+imshow(power_law);
+title('Power Law Transformation');
+
+%% 4. Bit Plane Slicing
+%% 4. Bit Plane Slicing
+
+figure;
+
+% Bit Plane 0 (LSB)
+bit0 = uint8(bitget(img,1) * 255);
+
+subplot(2,2,1);
+imshow(bit0);
+title('Bit Plane 0');
+
+% Bit Plane 1
+bit1 = uint8(bitget(img,2) * 255);
+
+subplot(2,2,2);
+imshow(bit1);
+title('Bit Plane 1');
+
+% Bit Plane 2
+bit2 = uint8(bitget(img,3) * 255);
+
+subplot(2,2,3);
+imshow(bit2);
+title('Bit Plane 2');
+%% 5. Intensity Level Slicing
+slice_img = img;
+
+low = 100;
+high = 180;
+
+slice_img(img >= low & img <= high) = 255;
+slice_img(img < low | img > high) = 0;
+
+figure;
+imshow(slice_img);
+title('Intensity Level Slicing');
+
+
+%take an image and perform:
+% iamge negative
+% log transformation
+% power law or gamma transformation
+% bit plane slicing
+% Intensity level slicing
