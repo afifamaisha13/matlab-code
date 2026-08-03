@@ -1,0 +1,117 @@
+clc;
+clear;
+close all;
+
+%% Read Image
+img = imread('burj.png');      % Replace with your own image
+if size(img,3)==3
+    img = rgb2gray(img);
+end
+
+img = im2double(img);
+
+%% Add Gaussian Noise
+noisy = imnoise(img,'gaussian',0,0.01);
+%% Window Size
+m = 3;
+n = 3;
+
+%% 1. Arithmetic Mean Filter
+meanFilter = fspecial('average',[m n]);
+mean_img = imfilter(noisy,meanFilter,'replicate');
+
+%% 2. Geometric Mean Filter
+geo_img = zeros(size(noisy));
+
+pad = padarray(noisy,[1 1],'replicate');
+
+for i=2:size(pad,1)-1
+    for j=2:size(pad,2)-1
+
+        block = pad(i-1:i+1,j-1:j+1);
+
+        block(block==0)=eps;
+
+        geo_img(i-1,j-1)=prod(block(:))^(1/9);
+
+    end
+end
+
+%% 3. Harmonic Mean Filter
+
+harm_img = zeros(size(noisy));
+
+for i=2:size(pad,1)-1
+    for j=2:size(pad,2)-1
+
+        block = pad(i-1:i+1,j-1:j+1);
+
+        block(block==0)=eps;
+
+        harm_img(i-1,j-1)=9/sum(1./block(:));
+
+    end
+end
+
+%% 4. Alpha Trimmed Mean Filter
+
+alpha = 2;
+
+alpha_img = zeros(size(noisy));
+
+for i=2:size(pad,1)-1
+    for j=2:size(pad,2)-1
+
+        block = sort(pad(i-1:i+1,j-1:j+1));
+
+        block = block(:);
+
+        block = block(alpha/2+1:end-alpha/2);
+
+        alpha_img(i-1,j-1)=mean(block);
+
+    end
+end
+
+%% MSE Calculation
+
+mse_mean = immse(img,mean_img);
+mse_geo = immse(img,geo_img);
+mse_harm = immse(img,harm_img);
+mse_alpha = immse(img,alpha_img);
+
+%% Display Images
+
+figure('Position',[100 100 1200 700]);
+
+subplot(2,3,1)
+imshow(img)
+title('Original')
+
+subplot(2,3,2)
+imshow(noisy)
+title('Noisy')
+
+subplot(2,3,3)
+imshow(mean_img)
+title('Arithmetic Mean')
+
+subplot(2,3,4)
+imshow(geo_img)
+title('Geometric Mean')
+
+subplot(2,3,5)
+imshow(harm_img)
+title('Harmonic Mean')
+
+subplot(2,3,6)
+imshow(alpha_img)
+title('Alpha Trimmed Mean')
+
+%% Display MSE
+
+fprintf('\n');
+fprintf('Arithmetic Mean Filter MSE = %.6f\n',mse_mean);
+fprintf('Geometric Mean Filter MSE  = %.6f\n',mse_geo);
+fprintf('Harmonic Mean Filter MSE   = %.6f\n',mse_harm);
+fprintf('Alpha Trimmed Filter MSE   = %.6f\n',mse_alpha);
