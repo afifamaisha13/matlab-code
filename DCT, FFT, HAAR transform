@@ -1,3 +1,4 @@
+/**version 1**/
 clc;
 clear;
 close all;
@@ -87,3 +88,110 @@ imshow(uint8(haar_img),[]);
 title('Haar Transform');
 
 
+
+
+**version 2**
+
+clc;
+clear;
+close all;
+
+%% Read Image
+img = imread('image.jpg');
+
+% Convert RGB to grayscale
+if size(img,3) == 3
+    img = rgb2gray(img);
+end
+
+img = double(img);
+
+% Make image dimensions even
+[r,c] = size(img);
+
+if mod(r,2) ~= 0
+    img(end,:) = [];
+end
+
+if mod(c,2) ~= 0
+    img(:,end) = [];
+end
+
+[r,c] = size(img);
+
+%% ======================
+% DCT
+%% ======================
+dct_img = dct2(img);
+
+%% ======================
+% FFT
+%% ======================
+fft_img = fft2(img);
+
+fft_shift = fftshift(fft_img);
+
+fft_spectrum = log(1 + abs(fft_shift));
+
+%% ======================
+% Haar Transform (Manual)
+%% ======================
+
+haar_temp = zeros(r,c);
+
+% Row Transform
+for i = 1:r
+    k = 1;
+    for j = 1:2:c
+
+        avg  = (img(i,j) + img(i,j+1))/2;
+        diff = (img(i,j) - img(i,j+1))/2;
+
+        haar_temp(i,k) = avg;
+        haar_temp(i,k + c/2) = diff;
+
+        k = k + 1;
+
+    end
+end
+
+haar_img = zeros(r,c);
+
+% Column Transform
+for j = 1:c
+    k = 1;
+    for i = 1:2:r
+
+        avg  = (haar_temp(i,j) + haar_temp(i+1,j))/2;
+        diff = (haar_temp(i,j) - haar_temp(i+1,j))/2;
+
+        haar_img(k,j) = avg;
+        haar_img(k + r/2,j) = diff;
+
+        k = k + 1;
+
+    end
+end
+
+%% ======================
+% Display
+%% ======================
+
+figure('Name','Image Transforms');
+
+subplot(2,2,1)
+imshow(uint8(img))
+title('Original Image')
+
+subplot(2,2,2)
+imshow(log(1 + abs(dct_img)),[])
+title('DCT')
+
+subplot(2,2,3)
+imshow(fft_spectrum,[])
+title('FFT Spectrum')
+
+subplot(2,2,4)
+imshow(haar_img,[])
+title('Haar Transform')
+colormap gray
