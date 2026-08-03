@@ -1,0 +1,98 @@
+clc;
+clear;
+close all;
+
+%% Read Two Color Images
+img1 = imread('burj.png');
+img2 = imread('image.jpg');
+
+%% Resize Second Image to Match First Image
+img2 = imresize(img2, [size(img1,1), size(img1,2)]);
+
+%% Display Original Images
+figure;
+subplot(3,3,1);
+imshow(img1);
+title('Image 1');
+
+subplot(3,3,2);
+imshow(img2);
+title('Image 2');
+
+%% Convert Images to Double (0-1)
+img1_d = im2double(img1);
+img2_d = im2double(img2);
+
+%% Arithmetic Operations
+
+% Addition
+add_img = img1_d + img2_d;
+add_img(add_img > 1) = 1;
+
+% Subtraction
+sub_img = img1_d - img2_d;
+sub_img(sub_img < 0) = 0;
+
+% Multiplication
+mul_img = img1_d .* img2_d;
+
+% Division
+div_img = img1_d ./ (img2_d + 0.01);
+div_img(div_img > 1) = 1;
+
+%% Logical Operations
+
+% Convert to uint8
+img1_u = im2uint8(img1_d);
+img2_u = im2uint8(img2_d);
+
+% AND
+and_img = bitand(img1_u, img2_u);
+
+% OR
+or_img = bitor(img1_u, img2_u);
+
+% NOT
+not_img = bitcmp(img1_u);
+
+%% Display Arithmetic Results
+
+subplot(3,3,3);
+imshow(add_img);
+title('Addition');
+
+subplot(3,3,4);
+imshow(sub_img);
+title('Subtraction');
+
+subplot(3,3,5);
+imshow(mul_img);
+title('Multiplication');
+
+subplot(3,3,6);
+imshow(div_img);
+title('Division');
+
+%% Display Logical Results
+
+subplot(3,3,7);
+imshow(and_img);
+title('AND');
+
+subplot(3,3,8);
+imshow(or_img);
+title('OR');
+
+subplot(3,3,9);
+imshow(not_img);
+title('NOT');
+
+%% Save Output Images
+
+imwrite(add_img,'add.jpg');
+imwrite(sub_img,'sub.jpg');
+imwrite(mul_img,'mul.jpg');
+imwrite(div_img,'div.jpg');
+imwrite(and_img,'and.jpg');
+imwrite(or_img,'or.jpg');
+imwrite(not_img,'not.jpg');
